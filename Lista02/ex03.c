@@ -41,7 +41,7 @@ void filho() {
     signal(SIGALRM, handler_signal);
 
     struct itimerval timer;
-    timer.it_value.tv_sec = 60;
+    timer.it_value.tv_sec = 2;
     timer.it_value.tv_usec = 0;
     timer.it_interval.tv_sec = 0;
     timer.it_interval.tv_usec = 0;
