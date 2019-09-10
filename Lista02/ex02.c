@@ -6,21 +6,13 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#define PAI 0
-#define FILHO 1
-#define NETO 2
-
 #define READ 0
 #define WRITE 1
 
-int tipo = PAI;
-
-// funcao de comparacao para ordenacao dos vetores dos filhos
-int cmp_func(const void* a, const void* b) {
-    int* a_int = (int*) a;
-    int* b_int = (int*) b;
-
-    return *a_int - *b_int;
+void swap(int* a, int*b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
 }
 
 int check_all_negative(const int* vec, int size) {
@@ -75,8 +67,9 @@ void filho(int* fd) {
     for(int i = 0; i < 3; i++) {
         pid = fork();
         if (pid == 0) {
-            tipo = NETO;
+            // tipo = NETO;
             neto(fd_filhos[i]);
+            close(fd_filhos[i][WRITE]);
         }
     }
 
@@ -85,20 +78,18 @@ void filho(int* fd) {
 
     // le os valores de cada filho e faz um vetor de 3 posicoes
     int vetor[3];
-    for(int i = 0; i < 3; i++)
+    for(int i = 0; i < 3; i++) {
         read(fd_filhos[i][READ], &vetor[i], sizeof(int));
+        close(fd_filhos[i][READ]);
+    }
 
     // ordena o vetor com os numeros dos filhos e envia para o pai
-    qsort(vetor, 3, sizeof(int), cmp_func);
+    if (vetor[0] > vetor[1]) swap(&vetor[0], &vetor[1]);
+    if (vetor[1] > vetor[2]) swap(&vetor[1], &vetor[2]);
+    if (vetor[0] > vetor[1]) swap(&vetor[0], &vetor[1]);
     write(fd[WRITE], vetor, sizeof(int)*3);
 
-    // fecha os pipes criados pelo pai e dos netos
-    for(int i = 0; i < 3; i++) {
-        close(fd_filhos[i][READ]);
-        close(fd_filhos[i][WRITE]);
-    }
     close(fd[WRITE]);
-
     exit(0);
 }
 
@@ -114,7 +105,7 @@ void pai() {
     for(int i = 0; i < 3; i++) {
         pid = fork();
         if (pid == 0) {
-            tipo = FILHO;
+            // tipo = FILHO;
             filho(fd[i]);
             close(fd[i][WRITE]);
         }
@@ -152,7 +143,6 @@ void pai() {
     // fecha o pipe
     for(int i = 0; i < 3; i++) {
         close(fd[i][READ]);
-        close(fd[i][WRITE]);
     }
 }
 
