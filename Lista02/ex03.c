@@ -15,7 +15,7 @@ int stop_monte_carlo = 0;
 
 void calc_pi_monte_carlo() {
     close(fd[READ]);
-    srand(time(NULL));
+    srand48(time(NULL));
 
     while (!stop_monte_carlo) {
         double rand_x = drand48();
