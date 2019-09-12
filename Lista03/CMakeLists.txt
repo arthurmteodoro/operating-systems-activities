@@ -3,4 +3,4 @@ project(Lista03 C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(Lista03 ex02.c)
+add_executable(Lista03 ex03.c)
