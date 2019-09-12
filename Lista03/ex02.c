@@ -1,9 +1,6 @@
-#include <dirent.h>     /* Defines DT_* constants */
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <sys/stat.h>
 #include <sys/syscall.h>
 
 struct linux_dirent {
@@ -16,7 +13,8 @@ struct linux_dirent {
 #define BUF_SIZE 1024
 
 int main(int argc, char *argv[]) {
-	int fd, nread;
+	int fd;
+	long nread;
 	char buf[BUF_SIZE];
 	struct linux_dirent *d;
 	int bpos;
