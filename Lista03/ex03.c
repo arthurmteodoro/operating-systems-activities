@@ -44,11 +44,16 @@ double** create_matrix(int row, int col) {
     void* brk_before_create_matrix = sbrk(0);
     double* mat = (double*) malloc(sizeof(double)*(row*col));
     void* brk_after_create_matrix = sbrk(0);
-    printf("Before: %p - After: %p\n", brk_before_create_matrix, brk_after_create_matrix);
+    printf("Matrix malloc: \n");
+    printf("Before: %p - After: %p - target: %ld bytes real: %ld kB \n", brk_before_create_matrix, brk_after_create_matrix, sizeof(double)*(row*col), (brk_after_create_matrix - brk_before_create_matrix)/1024);
     for(int i = 0; i < (row*col); i++) {
         mat[i] = i;
     }
+    void* brk_before_create_index_matrix = sbrk(0);
     double **rows_lookup = (double**) malloc(sizeof(double*)*row);
+    void* brk_after_create_index_matrix = sbrk(0);
+    printf("Matrix rows malloc: \n");
+    printf("Before: %p - After: %p - target %ld bytes real: %ld kB\n", brk_before_create_index_matrix, brk_after_create_index_matrix, sizeof(double*)*(row*col), (brk_after_create_index_matrix - brk_before_create_index_matrix)/1024);
     for (int i = 0; i < row; i++) {
         rows_lookup[i] = &mat[i*col];
     }
@@ -57,8 +62,17 @@ double** create_matrix(int row, int col) {
 }
 
 void destroy_matrix(double** matrix) {
+	void* brk_before_free_matrix = sbrk(0);
     free(matrix[0]);
+    void* brk_after_free_matrix = sbrk(0);
+    printf("Matrix free: \n");
+    printf("Before: %p - After: %p\n", brk_before_free_matrix, brk_after_free_matrix);
+    
+    void* brk_before_free_matrix_rows = sbrk(0);
     free(matrix);
+    void* brk_after_free_matrix_rows = sbrk(0);
+    printf("Matrix free: \n");
+    printf("Before: %p - After: %p\n", brk_before_free_matrix_rows, brk_after_free_matrix_rows);
 }
 
 void insert_values_matrix(double** matrix, int row, int col) {
@@ -87,6 +101,7 @@ void print_matrix(double** matrix, int row, int col) {
         if (i % col == 0) printf("\n");
         printf("%f ", mat[i]);
     }
+    printf("\n");
 }
 
 int main() {
