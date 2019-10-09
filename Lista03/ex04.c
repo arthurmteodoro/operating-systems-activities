@@ -59,7 +59,6 @@ void executeOneCommand(char** args) {
         }
         exit(0);
     } else {
-        // waiting for child to terminate
         wait(NULL);
         return;
     }
@@ -67,7 +66,6 @@ void executeOneCommand(char** args) {
 
 void executeTwoCommand(char** args1, char** args2)
 {
-    // 0 is read end, 1 is write end
     int pipefd[2];
     pid_t pid_1, pid_2;
 
@@ -93,7 +91,6 @@ void executeTwoCommand(char** args1, char** args2)
             exit(0);
         }
     } else {
-        // Parent executing
         pid_2 = fork();
 
         if (pid_2 < 0) {
@@ -169,7 +166,7 @@ int main() {
                 continue;
             }
             if (!strcmp(first_value, "clear")) {
-                if (system("CLS")) system("clear");
+                printf("\e[1;1H\e[2J");
                 continue;
             }
             if (!strcmp(first_value, "exit")) break;
