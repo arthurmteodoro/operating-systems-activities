@@ -4,17 +4,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define N 5
-#define LEFT (i+N-1)%N
-#define RIGHT (i+1)%N
+#define LEFT (i+size-1)%size
+#define RIGHT (i+1)%size
 
 #define THINKING 0
 #define HUNGRY 1
 #define EATING 2
 
-int state[N] = {THINKING};
+int size = 0;
+int* state;
 sem_t mutex;
-sem_t s[N];
+sem_t* s;
 
 void test(int i) {
     if(state[i] == HUNGRY && state[LEFT] != EATING && state[RIGHT] != EATING) {
@@ -54,30 +54,56 @@ void eat(int i) {
 void* philosopher(void* args) {
     int* i = (int*) args;
 
-    while(1) {
+    for(int j = 0; j < 5; j++) {
         think(*i);
         take_forks(*i);
         eat(*i);
         put_forks(*i);
     }
+
+    pthread_exit(0);
 }
 
-int main() {
-    pthread_t thread_phy[N];
-    int phy_id[N];
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: main <number_of_phy>");
+        exit(EXIT_FAILURE);
+    }
+
+    size = (int) strtol(argv[1], NULL, 10);
+
+    state = (int*) malloc(sizeof(int)*size);
+    s = (sem_t*) malloc(sizeof(sem_t)*size);
+
+    pthread_t* thread_phy;
+    int* phy_id;
+
+    thread_phy = (pthread_t*) malloc(sizeof(pthread_t)*size);
+    phy_id = (int*) malloc(sizeof(int)*size);
 
     sem_init(&mutex, 0, 1);
 
-    for(int i = 0; i < N; i++) {
+    for(int i = 0; i < size; i++) {
         sem_init(&s[i], 0, 0);
     }
 
-    for(int i = 0; i < N; i++) {
+    for(int i = 0; i < size; i++) {
         phy_id[i] = i;
         pthread_create(&thread_phy[i], NULL, philosopher, &phy_id[i]);
     }
 
-    for(int i = 0; i < N; i++) {
+    for(int i = 0; i < size; i++) {
         pthread_join(thread_phy[i], NULL);
     }
+
+    sem_destroy(&mutex);
+    for(int i = 0; i < size; i++) {
+        sem_destroy(&s[i]);
+    }
+    free(state);
+    free(s);
+    free(thread_phy);
+    free(phy_id);
+
+    return 0;
 }
