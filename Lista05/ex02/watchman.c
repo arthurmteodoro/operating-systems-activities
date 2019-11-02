@@ -54,7 +54,12 @@ void send_event(struct inotify_event *i, mqd_t queue) {
     }
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {    
+    if (argc > 1 && !strcmp(argv[1], "-h")) {
+        printf("Usage: ./watchman\n\n");
+        return 0;
+    }
+
     int inotifyFd, wd;
     char buf[BUF_LEN];
     size_t numRead;

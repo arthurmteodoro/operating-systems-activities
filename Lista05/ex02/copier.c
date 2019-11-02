@@ -95,6 +95,13 @@ void handler_event(struct inotify_event* event, char* path_watcher, char* dest, 
 }
 
 int main(int argc, char* argv[]) {
+    if (argc != 3) {
+        printf("Usage: ./copier <path_to_source> <path_to_dest>\n");
+        printf("\tExample: ./copier ./ ./bkp/\n\n");
+        
+        return 0;
+    }
+
     char buf[BUF_LEN];
 
     struct mq_attr attr;
@@ -115,4 +122,7 @@ int main(int argc, char* argv[]) {
         displayInotifyEvent(event);
         handler_event(event, argv[1], argv[2], mq_copy);
     }
+ 
+    mq_close(mq_copy);
+    return 0;
 }
